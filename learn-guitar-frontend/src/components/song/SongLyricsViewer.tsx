@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-import ChordDiagram from '../chord/ChordDiagram';
 import type { Chord } from '../../features/chord/chord.types';
 import type { SongChord, SongSection } from '../../features/song/song.types';
 
@@ -13,8 +12,6 @@ interface RenderToken {
   type: 'chord' | 'word';
   value: string;
 }
-
-const normalizeChordName = (value: string) => value.trim().toLowerCase();
 
 const buildTokens = (text: string, chords: SongChord[]): RenderToken[] => {
   const syllables = text.trim().split(/\s+/).filter(Boolean);
@@ -41,23 +38,11 @@ const buildTokens = (text: string, chords: SongChord[]): RenderToken[] => {
 };
 
 export default function SongLyricsViewer({ sections, chords }: SongLyricsViewerProps) {
-  const [activeChord, setActiveChord] = useState<Chord | null>(null);
-
-  const chordMap = useMemo(() => {
-    const map = new Map<string, Chord>();
-    chords.forEach((item) => {
-      map.set(normalizeChordName(item.name), item);
-      map.set(normalizeChordName(item.displayName), item);
-    });
-    return map;
+  const chordLookup = useMemo(() => {
+    void chords;
+    return new Map<string, Chord>();
   }, [chords]);
-
-  const openChord = (name: string) => {
-    const found = chordMap.get(normalizeChordName(name));
-    if (found) {
-      setActiveChord(found);
-    }
-  };
+  void chordLookup;
 
   return (
     <div className="song-lyrics-wrapper">
@@ -78,8 +63,6 @@ export default function SongLyricsViewer({ sections, chords }: SongLyricsViewerP
                           key={`${sectionIndex}-${lineIndex}-${tokenIndex}`}
                           type="button"
                           className="song-line-chord"
-                          onMouseEnter={() => openChord(token.value)}
-                          onClick={() => openChord(token.value)}
                         >
                           {token.value}
                         </button>

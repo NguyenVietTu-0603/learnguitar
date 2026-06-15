@@ -33,7 +33,6 @@ export default function TabPlaybackControls({
   const formatTime = () => {
     if (!totalEvents) return '0:00';
     const beatsPerBar = 4;
-    const totalBars = Math.ceil(totalEvents / beatsPerBar);
     const currentBar = Math.floor(currentTick / beatsPerBar) + 1;
     const beat = (currentTick % beatsPerBar) + 1;
     return `${currentBar}:${beat}`;

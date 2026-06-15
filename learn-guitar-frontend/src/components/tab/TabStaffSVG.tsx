@@ -114,7 +114,7 @@ function renderStaff(lines: {
 
       for (let s = 0; s < STRING_COUNT; s++) {
         const fret = stringFretMap[STRING_LABELS[s]];
-        if (fret !== undefined && fret !== null && fret !== '') {
+        if (fret !== undefined && fret !== null) {
           const cy = staffY + s * STAFF_LINE_GAP;
           const cssClass = isActive ? 'tab-fret-text--active' : 'tab-fret-text';
           svg += `<text x="${x + EVENT_WIDTH / 2}" y="${cy}" class="${cssClass}">${fret}</text>`;

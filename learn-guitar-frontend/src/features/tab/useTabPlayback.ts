@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { TAB_STRINGS } from './tab.types';
-import type { TabDetectionResult, TabStaff } from '../tab.types';
+import type { TabDetectionResult, TabStaff } from './tab.types';
 
 export type PlaybackState = 'stopped' | 'playing' | 'paused';
-
-const EVENT_WIDTH = 42;
-const STAFF_LEFT_PADDING = 52;
 
 const STRING_NOTES: Record<string, number[]> = {
   e: [64, 59, 55, 50, 45, 40, 35, 30],
@@ -20,39 +17,6 @@ function getNoteMidi(stringLabel: string, fret: number): number {
   const baseNotes = STRING_NOTES[stringLabel] ?? [60];
   const base = baseNotes[0];
   return base + fret;
-}
-
-function noteNameFromMidi(midi: number): string {
-  const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-  const octave = Math.floor(midi / 12) - 1;
-  const noteName = names[midi % 12];
-  return `${noteName}${octave}`;
-}
-
-interface EventNote {
-  staffIndex: number;
-  eventIndex: number;
-  midi: number;
-  stringLabel: string;
-}
-
-function flattenEvents(staffs: TabStaff[]): EventNote[] {
-  const notes: EventNote[] = [];
-  for (let si = 0; si < staffs.length; si++) {
-    const staff = staffs[si];
-    for (let ei = 0; ei < staff.events.length; ei++) {
-      const event = staff.events[ei];
-      const fretMap = event.string_fret_map ?? {};
-      for (const stringLabel of TAB_STRINGS) {
-        const fret = fretMap[stringLabel];
-        if (fret !== undefined && fret !== null && fret !== '') {
-          const midi = getNoteMidi(stringLabel, fret as number);
-          notes.push({ staffIndex: si, eventIndex: ei, midi, stringLabel });
-        }
-      }
-    }
-  }
-  return notes;
 }
 
 interface PlaybackConfig {
@@ -164,17 +128,15 @@ export function useTabPlayback(configRef: React.MutableRefObject<PlaybackConfig 
         return;
       }
 
-      const tickMs = Date.now();
-      const elapsed = (tickMs - (startTimeRef.current - (performance.now() - now) + now)) - (performance.now() - now);
+      const tickMs: number = Date.now();
+      void tickMs;
 
-      let eventIdx = 0;
       let globalEventIdx = 0;
       let foundCurrentEvent = false;
 
       for (let si = 0; si < allStaffs.length && !foundCurrentEvent; si++) {
         for (let ei = 0; ei < allStaffs[si].events.length; ei++, globalEventIdx++) {
           if (globalEventIdx === startEvent) {
-            eventIdx = ei;
             foundCurrentEvent = true;
             break;
           }
@@ -185,7 +147,7 @@ export function useTabPlayback(configRef: React.MutableRefObject<PlaybackConfig 
       for (let si = 0; si < allStaffs.length; si++) {
         const staff = allStaffs[si];
         for (let ei = 0; ei < staff.events.length; ei++) {
-          const globalIdx = allStaffs.slice(0, si).reduce((acc, s) => acc + s.events.length, 0) + ei;
+          const globalIdx = allStaffs.slice(0, si).reduce((acc: number, s: TabStaff) => acc + s.events.length, 0) + ei;
           if (globalIdx < startEvent) continue;
           const event = staff.events[ei];
           const fretMap = event.string_fret_map ?? {};
@@ -194,7 +156,7 @@ export function useTabPlayback(configRef: React.MutableRefObject<PlaybackConfig 
 
           for (const stringLabel of TAB_STRINGS) {
             const fret = fretMap[stringLabel];
-            if (fret !== undefined && fret !== null && fret !== '') {
+            if (fret !== undefined && fret !== null) {
               const midi = getNoteMidi(stringLabel, fret as number);
               playNote(midi, noteStartTime, noteDuration);
             }
@@ -313,7 +275,7 @@ export function useTabPlayback(configRef: React.MutableRefObject<PlaybackConfig 
     };
   }, []);
 
-  const totalEvents = configRef.current?.result.staffs.reduce((s, st) => s + st.events.length, 0) ?? 0;
+  const totalEvents = configRef.current?.result.staffs.reduce((s: number, st: TabStaff) => s + st.events.length, 0) ?? 0;
 
   return {
     playbackState,
