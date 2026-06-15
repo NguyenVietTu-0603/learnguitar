@@ -6,10 +6,12 @@
 venv/
 env/
 
-# Root-level Node leftovers (likely a stray scratch package.json using Prisma)
+# Root-level Node leftovers (likely a stray scratch package.json using Prisma).
+# Anchored with /package.json so it only matches the file at the repo root,
+# NOT package.json files inside subdirectories.
 node_modules/
-package.json
-package-lock.json
+/package.json
+/package-lock.json
 
 # Common IDE / OS junk (in case the editor saves them at workspace root)
 .vscode/
