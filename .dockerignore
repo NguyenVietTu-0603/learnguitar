@@ -12,3 +12,6 @@ tests
 __tests__
 .vscode
 .idea
+Flask-AI-API
+learn-guitar-frontend
+*.md
