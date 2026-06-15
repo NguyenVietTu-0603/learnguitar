@@ -13,7 +13,12 @@ def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    CORS(app)
+    cors_origins_env = os.getenv("CORS_ORIGINS", "*").strip()
+    if cors_origins_env and cors_origins_env != "*":
+        origins_list = [o.strip() for o in cors_origins_env.split(",") if o.strip()]
+        CORS(app, resources={r"/*": {"origins": origins_list}})
+    else:
+        CORS(app)
 
     ensure_directory(app.config["UPLOAD_FOLDER"])
     ensure_directory(app.config["OUTPUT_FOLDER"])
