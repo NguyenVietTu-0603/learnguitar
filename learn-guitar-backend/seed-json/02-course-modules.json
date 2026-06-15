@@ -1,0 +1,23 @@
+[
+  {
+    "_id": "665000000000000000000101",
+    "courseId": "665000000000000000000001",
+    "title": "Cam dan va len day",
+    "description": "Tu the ngoi, cam pick, va go day co ban.",
+    "order": 1
+  },
+  {
+    "_id": "665000000000000000000102",
+    "courseId": "665000000000000000000001",
+    "title": "Hop am mo thong dung",
+    "description": "Lam quen cac hop am C, G, Am, F, Dm.",
+    "order": 2
+  },
+  {
+    "_id": "665000000000000000000103",
+    "courseId": "665000000000000000000002",
+    "title": "Mau strumming co ban",
+    "description": "Thuc hanh downstroke/upstroke va metronome.",
+    "order": 1
+  }
+]

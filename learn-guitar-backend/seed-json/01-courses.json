@@ -1,0 +1,22 @@
+[
+  {
+    "_id": "665000000000000000000001",
+    "slug": "guitar-beginner-foundation",
+    "title": "Guitar Beginner Foundation",
+    "description": "Nhap mon guitar cho nguoi moi bat dau.",
+    "level": "beginner",
+    "thumbnailUrl": "https://cdn.example.com/course/beginner-foundation.jpg",
+    "isPublished": true,
+    "order": 1
+  },
+  {
+    "_id": "665000000000000000000002",
+    "slug": "guitar-rhythm-and-strumming",
+    "title": "Guitar Rhythm And Strumming",
+    "description": "Ren luyen nhac cam, strumming va nhip dieu.",
+    "level": "intermediate",
+    "thumbnailUrl": "https://cdn.example.com/course/rhythm-strumming.jpg",
+    "isPublished": true,
+    "order": 2
+  }
+]

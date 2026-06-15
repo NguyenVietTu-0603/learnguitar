@@ -1,0 +1,54 @@
+.chord-diagram-card {
+  border-radius: 18px;
+  border: 1px solid #cbd5e1;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  padding: 16px;
+}
+
+.chord-diagram-header {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.chord-diagram-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.chord-diagram-audio {
+  height: 32px;
+  max-width: 180px;
+}
+
+.chord-diagram-svg {
+  display: block;
+  margin: 0 0 0 14%;
+}
+
+.dark .chord-diagram-card {
+  border-color: #334155;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.4);
+}
+
+.dark .chord-diagram-title {
+  color: #f1f5f9;
+}
+
+@media (max-width: 640px) {
+  .chord-diagram-card {
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .chord-diagram-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

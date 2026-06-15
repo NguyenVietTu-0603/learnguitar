@@ -1,0 +1,4 @@
+# Flask-AI-API development dependencies
+pytest>=9.0.0
+pytest-cov>=7.1.0
+flask-testing>=0.8.1

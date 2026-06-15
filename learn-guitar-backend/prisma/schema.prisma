@@ -1,0 +1,442 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+enum Difficulty {
+  beginner
+  intermediate
+  advanced
+}
+
+enum LessonType {
+  video
+  theory
+  quiz
+}
+
+enum QuizType {
+  note_identify
+  chord_identify
+  fret_position
+}
+
+enum QuestionType {
+  note_name_mc
+  chord_name_mc
+  fret_select
+}
+
+enum AttemptStatus {
+  in_progress
+  submitted
+}
+
+enum ProgressEntityType {
+  course
+  module
+  lesson
+}
+
+enum ProgressStatus {
+  not_started
+  in_progress
+  completed
+}
+
+enum LearningEventType {
+  lesson_viewed
+  lesson_completed
+  quiz_submitted
+  streak_updated
+  badge_unlocked
+}
+
+enum TheoryTopic {
+  scale
+  interval
+  rhythm
+  key
+}
+
+enum BadgeRuleType {
+  streak
+  quiz_score
+  lesson_count
+  fretboard
+}
+
+enum ChordCategory {
+  major
+  minor
+  seventh
+  suspended
+  diminished
+  augmented
+  extended
+  other
+}
+
+model User {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String            @unique
+  role            String            @default("student")
+  avatar          String?
+  isActive        Boolean           @default(true)
+  currentStreakDays Int             @default(0)
+  lastLearningDate  DateTime?
+  songs           Song[]
+  quizAttempts    QuizAttempt[]
+  progresses      Progress[]
+  earnedBadges    UserBadge[]
+  learningHistories LearningHistory[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@map("users")
+}
+
+model Song {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  artist          String
+  slug            String           @unique
+  originalKey     String
+  capo            Int              @default(0)
+  tempo           Int?
+  timeSignature   String           @default("4/4")
+  strummingPattern String?
+  genre           String[]
+  difficulty      Difficulty       @default(beginner)
+  tags            String[]
+  youtubeLink     String?
+  image           String?
+  views           Int              @default(0)
+  isPublic        Boolean          @default(true)
+  lyrics          Json?
+  createdById     String           @db.ObjectId
+  createdBy       User             @relation(fields: [createdById], references: [id])
+  chordUsages     SongChordUsage[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([title])
+  @@index([artist])
+  @@index([difficulty])
+  @@index([genre])
+  @@map("songs")
+}
+
+model Chord {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  name        String           @unique
+  slug        String           @unique
+  displayName String
+  alias       String[]
+  positions   Int[]
+  fingers     Int[]
+  difficulty  Difficulty       @default(beginner)
+  capo        Int?
+  key         String?
+  notes       String[]
+  audioUrl    String?
+  diagramSvg  String?
+  isBarre     Boolean          @default(false)
+  category    ChordCategory    @default(other)
+  tags        String[]
+  popularity  Int              @default(0)
+  usageCount  Int              @default(0)
+  songUsages  SongChordUsage[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([category])
+  @@index([difficulty])
+  @@index([popularity])
+  @@map("chords")
+}
+
+model SongChordUsage {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  songId         String   @db.ObjectId
+  chordId        String   @db.ObjectId
+  positionInSong Int
+  song           Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  chord          Chord    @relation(fields: [chordId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([songId, chordId, positionInSong])
+  @@index([songId])
+  @@index([chordId])
+  @@map("songchordusages")
+}
+
+model Course {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String        @unique
+  title       String
+  description String?
+  level       Difficulty
+  thumbnailUrl String?
+  isPublished Boolean       @default(false)
+  order       Int           @default(0)
+  modules     CourseModule[]
+  lessons     Lesson[]
+  quizzes     Quiz[]
+  progresses  Progress[]
+  histories   LearningHistory[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([level, isPublished])
+  @@index([order])
+  @@map("courses")
+}
+
+model CourseModule {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  courseId    String        @db.ObjectId
+  title       String
+  description String?
+  order       Int           @default(0)
+  course      Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+  progresses  Progress[]
+  histories   LearningHistory[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([courseId, order])
+  @@index([courseId])
+  @@map("coursemodules")
+}
+
+model Lesson {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  courseId        String        @db.ObjectId
+  moduleId        String        @db.ObjectId
+  slug            String        @unique
+  title           String
+  summary         String?
+  lessonType      LessonType    @default(video)
+  level           Difficulty
+  videoUrlHls     String?
+  videoThumbnailUrl String?
+  durationSec     Int           @default(0)
+  tags            String[]
+  isPublished     Boolean       @default(false)
+  order           Int           @default(0)
+  course          Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module          CourseModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  quizzes         Quiz[]
+  progresses      Progress[]
+  histories       LearningHistory[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([moduleId, order])
+  @@index([courseId, level, isPublished])
+  @@index([moduleId])
+  @@map("lessons")
+}
+
+model Note {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  canonicalName   String
+  enharmonicNames String[]
+  octave          Int
+  frequencyHz     Float
+  midiNumber      Int               @unique
+  audioUrl        String
+  fretPositions   NoteFretPosition[]
+  quizQuestions   QuizQuestion[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([canonicalName, octave])
+  @@map("notes")
+}
+
+model NoteFretPosition {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  noteId       String   @db.ObjectId
+  stringNumber Int
+  fret         Int
+  note         Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+
+  @@unique([noteId, stringNumber, fret])
+  @@index([stringNumber, fret])
+  @@index([noteId])
+  @@map("notefretpositions")
+}
+
+model Quiz {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String        @unique
+  title       String
+  quizType    QuizType
+  level       Difficulty
+  courseId    String?       @db.ObjectId
+  lessonId    String?       @db.ObjectId
+  config      Json?
+  isPublished Boolean       @default(false)
+  course      Course?       @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  lesson      Lesson?       @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  questions   QuizQuestion[]
+  attempts    QuizAttempt[]
+  histories   LearningHistory[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([courseId, level, isPublished])
+  @@index([lessonId])
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  quizId           String       @db.ObjectId
+  questionType     QuestionType
+  prompt           String?
+  audioUrl         String
+  noteId           String?      @db.ObjectId
+  chordSlug        String?
+  correctAnswer    Json
+  options          Json?
+  difficultyWeight Float        @default(1)
+  quiz             Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  note             Note?        @relation(fields: [noteId], references: [id], onDelete: SetNull)
+  createdAt        DateTime     @default(now())
+
+  @@index([quizId])
+  @@index([noteId])
+  @@map("quizquestions")
+}
+
+model QuizAttempt {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  quizId         String        @db.ObjectId
+  userId         String        @db.ObjectId
+  startedAt      DateTime      @default(now())
+  finishedAt     DateTime?
+  totalQuestions Int           @default(0)
+  correctCount   Int           @default(0)
+  score          Float         @default(0)
+  durationSec    Int           @default(0)
+  answers        Json?
+  status         AttemptStatus @default(in_progress)
+  idempotencyKey String?       @unique
+  quiz           Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([quizId, score(sort: Desc)])
+  @@map("quizattempts")
+}
+
+model Progress {
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String             @db.ObjectId
+  entityType       ProgressEntityType
+  entityId         String             @db.ObjectId
+  courseId         String             @db.ObjectId
+  moduleId         String?            @db.ObjectId
+  lessonId         String?            @db.ObjectId
+  completionPercent Float             @default(0)
+  status           ProgressStatus     @default(not_started)
+  watchedSec       Int                @default(0)
+  quizBestScore    Float              @default(0)
+  accumulatedSec   Int                @default(0)
+  lastAccessAt     DateTime           @default(now())
+  completedAt      DateTime?
+  version          Int                @default(0)
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course           Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module           CourseModule?      @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  lesson           Lesson?            @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@unique([userId, entityType, entityId])
+  @@index([userId, courseId])
+  @@index([userId, status])
+  @@map("progresses")
+}
+
+model Badge {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  code        String        @unique
+  name        String
+  description String
+  iconUrl     String?
+  ruleType    BadgeRuleType
+  ruleConfig  Json?
+  users       UserBadge[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  badgeId    String   @db.ObjectId
+  unlockedAt DateTime @default(now())
+  source     String?
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge      Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId, unlockedAt(sort: Desc)])
+  @@map("userbadges")
+}
+
+model LearningHistory {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String            @db.ObjectId
+  eventType LearningEventType
+  courseId  String?           @db.ObjectId
+  moduleId  String?           @db.ObjectId
+  lessonId  String?           @db.ObjectId
+  quizId    String?           @db.ObjectId
+  metadata  Json?
+  eventAt   DateTime          @default(now())
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course?           @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  module    CourseModule?     @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  lesson    Lesson?           @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  quiz      Quiz?             @relation(fields: [quizId], references: [id], onDelete: SetNull)
+  createdAt DateTime          @default(now())
+
+  @@index([userId, eventAt(sort: Desc)])
+  @@index([eventType, eventAt(sort: Desc)])
+  @@map("learninghistories")
+}
+
+model TheoryLesson {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  slug            String      @unique
+  title           String
+  topic           TheoryTopic
+  level           Difficulty
+  contentRichText Json
+  coverImageUrl   String?
+  embeddedVideoUrl String?
+  tags            String[]
+  isPublished     Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([topic, level, isPublished])
+  @@map("theorylessons")
+}

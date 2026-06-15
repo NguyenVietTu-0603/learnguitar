@@ -1,0 +1,59 @@
+[
+  {
+    "quizId": "665000000000000000000401",
+    "questionType": "note_name_mc",
+    "prompt": "Nghe am thanh va chon ten not.",
+    "audioUrl": "/static/audio/notes/c4.mp3",
+    "noteId": "665000000000000000000301",
+    "chordSlug": null,
+    "correctAnswer": {
+      "noteName": "C"
+    },
+    "options": ["C", "D", "E", "F"],
+    "difficultyWeight": 1
+  },
+  {
+    "quizId": "665000000000000000000401",
+    "questionType": "fret_select",
+    "prompt": "Chon vi tri not G tren can dan.",
+    "audioUrl": "/static/audio/notes/g3.mp3",
+    "noteId": "665000000000000000000302",
+    "chordSlug": null,
+    "correctAnswer": {
+      "positions": [
+        { "stringNumber": 3, "fret": 0 },
+        { "stringNumber": 6, "fret": 3 }
+      ]
+    },
+    "options": null,
+    "difficultyWeight": 1.2
+  },
+  {
+    "quizId": "665000000000000000000402",
+    "questionType": "chord_name_mc",
+    "prompt": "Nghe hop am va chon ten dung.",
+    "audioUrl": "/static/audio/chords/c.mp3",
+    "noteId": null,
+    "chordSlug": "c",
+    "correctAnswer": {
+      "chordName": "C",
+      "aliases": ["Do"]
+    },
+    "options": ["C", "G", "Am", "Dm"],
+    "difficultyWeight": 1
+  },
+  {
+    "quizId": "665000000000000000000402",
+    "questionType": "chord_name_mc",
+    "prompt": "Nghe hop am va chon ten dung.",
+    "audioUrl": "/static/audio/chords/am.mp3",
+    "noteId": null,
+    "chordSlug": "am",
+    "correctAnswer": {
+      "chordName": "Am",
+      "aliases": ["La minor"]
+    },
+    "options": ["C", "Am", "F", "G"],
+    "difficultyWeight": 1
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "database": "mongodb",
+  "collectionsImportOrder": [
+    "courses",
+    "coursemodules",
+    "lessons",
+    "notes",
+    "notefretpositions",
+    "quizzes",
+    "quizquestions"
+  ],
+  "notes": [
+    "Import theo thu tu tren de dam bao quan he ObjectId.",
+    "File nay chi de huong dan, khong import vao collection."
+  ]
+}

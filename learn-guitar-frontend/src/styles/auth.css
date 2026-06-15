@@ -1,0 +1,116 @@
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-layout-login {
+  background: radial-gradient(circle at 15% 20%, #ffe4b8 0%, transparent 45%),
+    radial-gradient(circle at 88% 15%, #99e6ff 0%, transparent 38%),
+    linear-gradient(135deg, #fffaf0 0%, #f3f8ff 45%, #eefcf7 100%);
+}
+
+.auth-layout-register {
+  background: radial-gradient(circle at 12% 12%, #ffd2b6 0%, transparent 40%),
+    radial-gradient(circle at 84% 22%, #b5ffd8 0%, transparent 36%),
+    linear-gradient(135deg, #fff9f2 0%, #f4fff8 50%, #f1f7ff 100%);
+}
+
+.auth-card {
+  width: min(520px, 100%);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(25, 43, 77, 0.1);
+  box-shadow: 0 18px 60px rgba(19, 39, 71, 0.15);
+  backdrop-filter: blur(8px);
+  padding: 36px;
+}
+
+.auth-card h1 {
+  margin: 12px 0 8px;
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 4.8vw, 44px);
+  line-height: 1.05;
+  color: #13223f;
+}
+
+.auth-subtitle {
+  margin: 0 0 20px;
+  color: #305074;
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: #183355;
+}
+
+.auth-form input {
+  border: 1px solid #c8d7e9;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font: inherit;
+  color: #112744;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-form input:focus {
+  border-color: #2f7dd9;
+  box-shadow: 0 0 0 4px rgba(47, 125, 217, 0.16);
+}
+
+.password-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-wrap input {
+  flex: 1;
+}
+
+.toggle-password {
+  border: 1px solid #c8d7e9;
+  background: #f7fbff;
+  color: #18406f;
+  border-radius: 10px;
+  min-width: 54px;
+  padding: 10px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggle-password:hover {
+  background: #edf6ff;
+}
+
+.auth-footnote {
+  margin: 18px 0 0;
+  color: #2d4f74;
+}
+
+.auth-footnote a {
+  color: #0d5db7;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-footnote a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 24px;
+    border-radius: 18px;
+  }
+}

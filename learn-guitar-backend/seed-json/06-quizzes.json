@@ -1,0 +1,28 @@
+[
+  {
+    "_id": "665000000000000000000401",
+    "slug": "quiz-beginner-note-identify",
+    "title": "Beginner Note Identify",
+    "quizType": "note_identify",
+    "level": "beginner",
+    "courseId": "665000000000000000000001",
+    "lessonId": "665000000000000000000202",
+    "config": {
+      "questionCount": 8
+    },
+    "isPublished": true
+  },
+  {
+    "_id": "665000000000000000000402",
+    "slug": "quiz-beginner-chord-identify",
+    "title": "Beginner Chord Identify",
+    "quizType": "chord_identify",
+    "level": "beginner",
+    "courseId": "665000000000000000000001",
+    "lessonId": "665000000000000000000202",
+    "config": {
+      "questionCount": 10
+    },
+    "isPublished": true
+  }
+]

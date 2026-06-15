@@ -1,0 +1,50 @@
+[
+  {
+    "_id": "665000000000000000000201",
+    "courseId": "665000000000000000000001",
+    "moduleId": "665000000000000000000101",
+    "slug": "gioi-thieu-guitar-co-ban",
+    "title": "Gioi thieu guitar co ban",
+    "summary": "Nhan dien cac bo phan cua dan guitar va cach len day.",
+    "lessonType": "video",
+    "level": "beginner",
+    "videoUrlHls": "https://cdn.example.com/hls/lesson-intro.m3u8",
+    "videoThumbnailUrl": "https://cdn.example.com/thumb/lesson-intro.jpg",
+    "durationSec": 420,
+    "tags": ["intro", "setup"],
+    "isPublished": true,
+    "order": 1
+  },
+  {
+    "_id": "665000000000000000000202",
+    "courseId": "665000000000000000000001",
+    "moduleId": "665000000000000000000102",
+    "slug": "luyen-hop-am-c-g-am",
+    "title": "Luyen hop am C G Am",
+    "summary": "Chuyen hop am C, G, Am muot va dung nhip.",
+    "lessonType": "quiz",
+    "level": "beginner",
+    "videoUrlHls": "https://cdn.example.com/hls/lesson-cga.m3u8",
+    "videoThumbnailUrl": "https://cdn.example.com/thumb/lesson-cga.jpg",
+    "durationSec": 600,
+    "tags": ["chords", "practice"],
+    "isPublished": true,
+    "order": 1
+  },
+  {
+    "_id": "665000000000000000000203",
+    "courseId": "665000000000000000000002",
+    "moduleId": "665000000000000000000103",
+    "slug": "strumming-4-4-co-ban",
+    "title": "Strumming 4/4 co ban",
+    "summary": "Ren luyen mau quat xuong len trong nhip 4/4.",
+    "lessonType": "video",
+    "level": "intermediate",
+    "videoUrlHls": "https://cdn.example.com/hls/lesson-strumming-44.m3u8",
+    "videoThumbnailUrl": "https://cdn.example.com/thumb/lesson-strumming-44.jpg",
+    "durationSec": 540,
+    "tags": ["strumming", "rhythm"],
+    "isPublished": true,
+    "order": 1
+  }
+]

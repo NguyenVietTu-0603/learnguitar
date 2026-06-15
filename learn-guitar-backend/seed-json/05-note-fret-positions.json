@@ -1,0 +1,32 @@
+[
+  {
+    "noteId": "665000000000000000000301",
+    "stringNumber": 2,
+    "fret": 1
+  },
+  {
+    "noteId": "665000000000000000000301",
+    "stringNumber": 5,
+    "fret": 3
+  },
+  {
+    "noteId": "665000000000000000000302",
+    "stringNumber": 3,
+    "fret": 0
+  },
+  {
+    "noteId": "665000000000000000000302",
+    "stringNumber": 6,
+    "fret": 3
+  },
+  {
+    "noteId": "665000000000000000000303",
+    "stringNumber": 3,
+    "fret": 2
+  },
+  {
+    "noteId": "665000000000000000000303",
+    "stringNumber": 5,
+    "fret": 0
+  }
+]

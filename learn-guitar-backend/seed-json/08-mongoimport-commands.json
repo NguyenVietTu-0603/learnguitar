@@ -1,0 +1,12 @@
+{
+  "description": "Thay DATABASE_NAME va MONGODB_URI theo moi truong cua ban.",
+  "commands": [
+    "mongoimport --uri \"MONGODB_URI\" --db DATABASE_NAME --collection courses --file seed-json/01-courses.json --jsonArray",
+    "mongoimport --uri \"MONGODB_URI\" --db DATABASE_NAME --collection coursemodules --file seed-json/02-course-modules.json --jsonArray",
+    "mongoimport --uri \"MONGODB_URI\" --db DATABASE_NAME --collection lessons --file seed-json/03-lessons.json --jsonArray",
+    "mongoimport --uri \"MONGODB_URI\" --db DATABASE_NAME --collection notes --file seed-json/04-notes.json --jsonArray",
+    "mongoimport --uri \"MONGODB_URI\" --db DATABASE_NAME --collection notefretpositions --file seed-json/05-note-fret-positions.json --jsonArray",
+    "mongoimport --uri \"MONGODB_URI\" --db DATABASE_NAME --collection quizzes --file seed-json/06-quizzes.json --jsonArray",
+    "mongoimport --uri \"MONGODB_URI\" --db DATABASE_NAME --collection quizquestions --file seed-json/07-quiz-questions.json --jsonArray"
+  ]
+}
