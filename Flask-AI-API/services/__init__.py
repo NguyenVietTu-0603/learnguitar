@@ -5,6 +5,7 @@ from .postprocess import PostProcessor
 from .json_builder import JSONBuilder
 from .renderer import TabRenderer
 from .visualizer import DetectionVisualizer
+from .audio_service import AudioService, fret_to_frequency, midi_to_frequency
 
 __all__ = [
     "DetectorService",
@@ -13,4 +14,7 @@ __all__ = [
     "JSONBuilder",
     "TabRenderer",
     "DetectionVisualizer",
+    "AudioService",
+    "fret_to_frequency",
+    "midi_to_frequency",
 ]

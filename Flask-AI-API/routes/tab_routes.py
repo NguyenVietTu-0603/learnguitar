@@ -5,7 +5,15 @@ from uuid import uuid4
 import cv2
 from flask import Blueprint, current_app, request
 
-from services import DetectionVisualizer, DetectorService, JSONBuilder, LineProcessor, PostProcessor, TabRenderer
+from services import (
+    AudioService,
+    DetectionVisualizer,
+    DetectorService,
+    JSONBuilder,
+    LineProcessor,
+    PostProcessor,
+    TabRenderer,
+)
 from utils import allowed_file, build_safe_filename, ensure_directory, error_response, success_response
 
 
@@ -45,6 +53,7 @@ def detect_tab():
     post_processor: PostProcessor = services["post_processor"]
     json_builder: JSONBuilder = services["json_builder"]
     visualizer: DetectionVisualizer = services["visualizer"]
+    audio_service: AudioService = services["audio"]
 
     try:
         detections = detector.detect(image)
@@ -82,11 +91,12 @@ def detect_tab():
 
     output_dir = current_app.config["OUTPUT_FOLDER"]
     ensure_directory(output_dir)
-    output_filename = f"{Path(safe_name).stem}.json"
+    tab_id = uuid4().hex
+    output_filename = f"{tab_id}.json"
     output_path = Path(output_dir) / output_filename
     output_path.write_text(json.dumps(output_json, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    annotated_filename = f"{Path(safe_name).stem}_annotated.jpg"
+    annotated_filename = f"{tab_id}_annotated.jpg"
     annotated_path = Path(output_dir) / annotated_filename
     visualizer.annotate(
         image=image,
@@ -96,11 +106,33 @@ def detect_tab():
         output_path=annotated_path,
     )
 
+    # Tự động tổng hợp audio từ note đã nhận diện
+    audio_filename = None
+    audio_path = None
+    audio_url = None
+    audio_error = None
+    try:
+        wav_bytes = audio_service.build_wav_from_tab(output_json)
+        audio_filename = f"{tab_id}.wav"
+        audio_path = audio_service.save_wav(wav_bytes, audio_filename)
+        if audio_path:
+            audio_url = f"/outputs/{audio_filename}"
+    except Exception as exc:
+        audio_error = str(exc)
+
     response_data = {
+        "tab_id": tab_id,
         "result": output_json,
         "saved_json_path": str(output_path),
         "uploaded_image_path": saved_path,
         "annotated_image_path": str(annotated_path),
+        "audio": {
+            "available": audio_path is not None,
+            "audio_url": audio_url,
+            "audio_path": audio_path,
+            "filename": audio_filename,
+            "error": audio_error,
+        },
     }
     return success_response(response_data, message="Detection completed")
 

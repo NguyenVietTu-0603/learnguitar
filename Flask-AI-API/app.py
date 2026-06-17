@@ -4,8 +4,16 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 
 from config import Config
-from routes import health_bp, tab_bp
-from services import DetectionVisualizer, DetectorService, JSONBuilder, LineProcessor, PostProcessor, TabRenderer
+from routes import audio_bp, health_bp, tab_bp
+from services import (
+    AudioService,
+    DetectionVisualizer,
+    DetectorService,
+    JSONBuilder,
+    LineProcessor,
+    PostProcessor,
+    TabRenderer,
+)
 from utils import ensure_directory
 
 
@@ -35,44 +43,27 @@ def ensure_model_file(model_path: str) -> None:
 
     os.makedirs(os.path.dirname(model_path) or ".", exist_ok=True)
     print(f"[startup] Downloading model from {MODEL_DOWNLOAD_URL} -> {model_path}")
-    import re
-    import urllib.parse
-    import urllib.request
-    import http.cookiejar
 
     download_url = MODEL_DOWNLOAD_URL
     if "drive.google.com" in download_url:
-        m = re.search(r"/d/([\w-]+)", download_url) or re.search(r"id=([\w-]+)", download_url)
-        if m:
-            file_id = m.group(1)
-            download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
-
-    cookie_jar = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar))
-    urllib.request.install_opener(opener)
-
-    def _download(url: str, dst: str) -> None:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with opener.open(req, timeout=600) as resp:
-            content_type = resp.headers.get("Content-Type", "")
-            if "text/html" in content_type:
-                html = resp.read().decode("utf-8", errors="ignore")
-                confirm_match = re.search(r"confirm=([0-9A-Za-z_-]+)", html)
-                if confirm_match:
-                    confirm_token = confirm_match.group(1)
-                    sep = "&" if "?" in url else "?"
-                    url2 = f"{url}{sep}confirm={confirm_token}"
-                    with opener.open(urllib.request.Request(url2, headers={"User-Agent": "Mozilla/5.0"}), timeout=600) as resp2:
-                        _write_stream(resp2, dst)
-                    return
-                raise RuntimeError("Google Drive returned HTML without confirm token; please re-host the model.")
-            _write_stream(resp, dst)
-
-    def _write_stream(resp, dst: str) -> None:
-        total = int(resp.headers.get("Content-Length") or 0)
-        read = 0
-        chunk = 1024 * 1024
-        with open(dst, "wb") as out:
+        try:
+            import gdown  # type: ignore
+        except ImportError:
+            print("[startup] gdown not installed, installing...")
+            import subprocess
+            subprocess.run(
+                ["pip", "install", "--quiet", "gdown"],
+                check=True,
+            )
+            import gdown  # type: ignore
+        gdown.download(download_url, model_path, quiet=False)
+    else:
+        import urllib.request
+        req = urllib.request.Request(download_url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=600) as resp, open(model_path, "wb") as out:
+            total = int(resp.headers.get("Content-Length") or 0)
+            read = 0
+            chunk = 1024 * 1024
             while True:
                 block = resp.read(chunk)
                 if not block:
@@ -82,7 +73,6 @@ def ensure_model_file(model_path: str) -> None:
                 if total:
                     print(f"[startup] {read/1e6:.1f}/{total/1e6:.1f} MB", end="\r", flush=True)
 
-    _download(download_url, model_path)
     size_mb = os.path.getsize(model_path) / 1e6
     print(f"[startup] Model downloaded: {size_mb:.1f} MB")
 
@@ -109,6 +99,10 @@ def create_app() -> Flask:
     json_builder = JSONBuilder()
     renderer = TabRenderer()
     visualizer = DetectionVisualizer()
+    audio_service = AudioService(
+        output_dir=app.config["OUTPUT_FOLDER"],
+        sample_rate=44100,
+    )
 
     app.extensions["services"] = {
         "detector": detector,
@@ -117,11 +111,13 @@ def create_app() -> Flask:
         "json_builder": json_builder,
         "renderer": renderer,
         "visualizer": visualizer,
+        "audio": audio_service,
     }
 
     api_prefix = app.config["API_PREFIX"]
     app.register_blueprint(health_bp)
     app.register_blueprint(tab_bp, url_prefix=api_prefix)
+    app.register_blueprint(audio_bp, url_prefix=api_prefix)
 
     @app.get("/uploads/<path:filename>")
     def serve_upload(filename: str):
@@ -144,6 +140,10 @@ def create_app() -> Flask:
                 f"{api_prefix}/tab/render",
                 f"{api_prefix}/tab/save",
                 f"{api_prefix}/tab/<tab_id>",
+                f"{api_prefix}/audio/play",
+                f"{api_prefix}/audio/play-server",
+                f"{api_prefix}/audio/preview",
+                f"{api_prefix}/audio/info",
             ],
         }
 

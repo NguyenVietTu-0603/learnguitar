@@ -24,6 +24,10 @@ class DetectorService:
         if self.model_path and os.path.exists(self.model_path):
             from ultralytics import YOLO
             self.model = YOLO(self.model_path)
+        else:
+            raise RuntimeError(
+                f"Model file not found at: {self.model_path}"
+            )
 
     def detect(self, image: np.ndarray) -> list[dict]:
         """

@@ -1,78 +1,48 @@
+# Test artifacts
+test/
+*.tmp
+
+# ONNX export (built from best.pt at deploy time if needed)
+best.onnx
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-develop-eggs/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
-.venv/
-venv/
-env/
-ENV/
-.env/
-
-# Test / coverage
-.pytest_cache/
 .coverage
 .coverage.*
 htmlcov/
-coverage/
+.pytest_cache/
 .tox/
-.nox/
-.cache
-.pyright/
-.mypy_cache/
-.ruff_cache/
 
-# Distribution / packaging
-build/
-dist/
-*.whl
-
-# Environment variables (NEVER commit)
+# Environment / secrets
 .env
 .env.local
-.env.*.local
+.venv
+venv/
+env/
 
-# Model files (handled by .gitattributes + Git LFS)
-# *.pt and *.onnx are tracked via LFS, NOT ignored here
+# Test scripts (not part of production)
+convert_to_onnx.py
+find_chord.py
+test_real.py
+test_chord_real.py
+test_5_strings.py
+test_2strings.py
+test_window.py
 
-# Editor / IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
+# Test output artifacts
+chord_5.wav
+chord_test.wav
+real_test.wav
+test_2strings.wav
+outputs/*.wav
+outputs/*_annotated.jpg
+uploads/
 
-# OS / misc
-*.log
-logs/
-
-# Runtime generated folders (sample data, uploads, outputs)
-uploads/*
-!uploads/.gitkeep
-!uploads/samples/
-!uploads/samples/.gitkeep
-outputs/*
-!outputs/.gitkeep
-
-# YOLO training artifacts (heavy, not needed in repo)
-runs/
-*.pt.train
+# Large binary files (downloaded at deploy)
+FluidR3Mono_GM.sf3
+*.pt
+*.onnx
