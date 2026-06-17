@@ -31,8 +31,8 @@ export default function TabImagePage() {
   const [tempo, setTempo] = useState(100);
   const [isBuildingWav, setIsBuildingWav] = useState(false);
   const [wavError, setWavError] = useState<string | null>(null);
-  const [highlightStaff, setHighlightStaff] = useState(0);
-  const [highlightEvent, setHighlightEvent] = useState(0);
+  const [_highlightStaff, setHighlightStaff] = useState(0);
+  const [_highlightEvent, setHighlightEvent] = useState(0);
 
   // Keep latest playback config accessible to useTabPlayback via ref
   const playbackConfigRef = useRef<{
