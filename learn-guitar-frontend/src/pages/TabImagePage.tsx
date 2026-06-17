@@ -1,8 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AppButton from '../components/common/AppButton';
 import TabStaffSVG from '../components/tab/TabStaffSVG';
-import { getSavedTab, detectTabFromImage, saveTab } from '../features/tab/tab.service';
+import TabPlaybackControls from '../components/tab/TabPlaybackControls';
+import {
+  buildAudioFromTab,
+  getSavedTab,
+  detectTabFromImage,
+  saveTab,
+} from '../features/tab/tab.service';
+import { useTabPlayback } from '../features/tab/useTabPlayback';
 import type { TabDetectionResponse, TabDetectionResult } from '../features/tab/tab.types';
 import { computeDetectionStats, normalizeDetectionResult } from '../features/tab/tab.utils';
 
@@ -19,6 +26,50 @@ export default function TabImagePage() {
   const [detectAssets, setDetectAssets] = useState<Pick<TabDetectionResponse, 'saved_json_path' | 'uploaded_image_path' | 'annotated_image_path'> | null>(null);
 
   const activeResult = detectResult;
+
+  // Audio playback state
+  const [tempo, setTempo] = useState(100);
+  const [isBuildingWav, setIsBuildingWav] = useState(false);
+  const [wavError, setWavError] = useState<string | null>(null);
+  const [highlightStaff, setHighlightStaff] = useState(0);
+  const [highlightEvent, setHighlightEvent] = useState(0);
+
+  // Keep latest playback config accessible to useTabPlayback via ref
+  const playbackConfigRef = useRef<{
+    result: TabDetectionResult;
+    tempo: number;
+    onTick: (staffIndex: number, eventIndex: number) => void;
+    onEnd: () => void;
+  } | null>(null);
+
+  if (activeResult) {
+    playbackConfigRef.current = {
+      result: activeResult,
+      tempo,
+      onTick: (staffIndex, eventIndex) => {
+        setHighlightStaff(staffIndex);
+        setHighlightEvent(eventIndex);
+      },
+      onEnd: () => {
+        setHighlightStaff(0);
+        setHighlightEvent(0);
+      },
+    };
+  } else {
+    playbackConfigRef.current = null;
+  }
+
+  const {
+    playbackState,
+    currentTick,
+    totalEvents,
+    play,
+    pause,
+    resume,
+    stop,
+    seekTo,
+  } = useTabPlayback(playbackConfigRef);
+
   const stats = useMemo(() => computeDetectionStats(activeResult), [activeResult]);
   const queryTabId = searchParams.get('tab_id');
 
@@ -123,6 +174,63 @@ export default function TabImagePage() {
       setErrorMessage(error instanceof Error ? error.message : 'Không thể lưu tab đã chỉnh sửa.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleStopPlayback = () => {
+    stop();
+    setHighlightStaff(0);
+    setHighlightEvent(0);
+  };
+
+  const handleSeekPlayback = (eventIndex: number) => {
+    seekTo(eventIndex);
+    if (activeResult) {
+      let staffIdx = 0;
+      let remaining = eventIndex;
+      for (let si = 0; si < activeResult.staffs.length; si++) {
+        if (remaining < activeResult.staffs[si].events.length) {
+          staffIdx = si;
+          break;
+        }
+        remaining -= activeResult.staffs[si].events.length;
+      }
+      setHighlightStaff(staffIdx);
+      setHighlightEvent(remaining);
+    }
+  };
+
+  const handlePlayPreview = () => {
+    if (!activeResult) return;
+    if (playbackState === 'paused') {
+      resume();
+    } else {
+      play();
+    }
+  };
+
+  const handleDownloadWav = async () => {
+    if (!activeResult) return;
+    setIsBuildingWav(true);
+    setWavError(null);
+    try {
+      const blob = await buildAudioFromTab(activeResult, {
+        noteDuration: 0.5,
+        silenceBetween: 0.05,
+      });
+      const url = URL.createObjectURL(blob);
+      const tabId = activeResult.metadata?.tab_id || 'tablature';
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `${tabId}.wav`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      setWavError(error instanceof Error ? error.message : 'Không thể tải file WAV.');
+    } finally {
+      setIsBuildingWav(false);
     }
   };
 
@@ -293,8 +401,53 @@ export default function TabImagePage() {
                   <p className="tab-kicker">Rendered</p>
                   <h3>Tablature từ dữ liệu AI</h3>
                 </div>
+                <div className="tab-staff-card__actions">
+                  <button
+                    type="button"
+                    className="tab-audio-btn tab-audio-btn--preview"
+                    onClick={handlePlayPreview}
+                    disabled={totalEvents === 0}
+                    title="Phát nhanh bằng Web Audio (nghe tức thì)"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M4 2.5L13 8L4 13.5V2.5Z" fill="currentColor" />
+                    </svg>
+                    Nghe thử
+                  </button>
+                  <button
+                    type="button"
+                    className="tab-audio-btn tab-audio-btn--download"
+                    onClick={handleDownloadWav}
+                    disabled={isBuildingWav}
+                    title="Tổng hợp WAV từ Flask AI server rồi tải về máy"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M8 1.5v9m0 0L4.5 7M8 10.5L11.5 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M2.5 12.5v1A1.5 1.5 0 0 0 4 15h8a1.5 1.5 0 0 0 1.5-1.5v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    {isBuildingWav ? 'Đang tạo WAV...' : 'Tải WAV'}
+                  </button>
+                </div>
               </div>
-              <TabStaffSVG result={activeResult} isLoading={false} />
+              {wavError ? <div className="tab-audio-error">{wavError}</div> : null}
+              <TabStaffSVG
+                result={activeResult}
+                isLoading={false}
+                currentTick={currentTick}
+                isPlaying={playbackState === 'playing'}
+              />
+              <TabPlaybackControls
+                playbackState={playbackState}
+                currentTick={currentTick}
+                totalEvents={totalEvents}
+                tempo={tempo}
+                onPlay={play}
+                onPause={pause}
+                onResume={resume}
+                onStop={handleStopPlayback}
+                onTempoChange={setTempo}
+                onSeek={handleSeekPlayback}
+              />
             </div>
           </div>
         </div>

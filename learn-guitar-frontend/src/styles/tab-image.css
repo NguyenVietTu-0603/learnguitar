@@ -608,4 +608,222 @@
   .tab-summary-grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  .tab-staff-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tab-staff-card__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+/* ===== Audio action buttons ===== */
+.tab-staff-card__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tab-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 160ms ease;
+  white-space: nowrap;
+}
+
+.tab-audio-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tab-audio-btn--preview {
+  background: linear-gradient(135deg, #e67a3d, #d97757);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(200, 125, 74, 0.25);
+}
+
+.tab-audio-btn--preview:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 125, 74, 0.35);
+}
+
+.tab-audio-btn--download {
+  background: rgba(201, 166, 107, 0.1);
+  border-color: rgba(201, 166, 107, 0.35);
+  color: #8a6a2c;
+}
+
+.tab-audio-btn--download:hover:not(:disabled) {
+  background: rgba(201, 166, 107, 0.18);
+  border-color: rgba(201, 166, 107, 0.55);
+}
+
+.tab-audio-error {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: var(--tab-radius-sm);
+  background: rgba(224, 80, 80, 0.06);
+  border: 1px solid rgba(224, 80, 80, 0.25);
+  color: #c03030;
+  font-size: 0.85rem;
+}
+
+/* ===== Playback card (from TabPlaybackControls) ===== */
+.tab-playback {
+  margin-top: 16px;
+  padding: 16px 18px;
+  background: rgba(249, 245, 238, 0.78);
+  border: 1px solid var(--tab-border);
+  border-radius: var(--tab-radius-md);
+}
+
+.tab-playback__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tab-playback__time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2f2a22;
+}
+
+.tab-playback__timeline {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.tab-playback__scrubber {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(
+    to right,
+    #e67a3d 0%,
+    #e67a3d var(--progress, 0%),
+    rgba(150, 130, 110, 0.18) var(--progress, 0%),
+    rgba(150, 130, 110, 0.18) 100%
+  );
+  border-radius: 3px;
+  outline: none;
+}
+
+.tab-playback__scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #e67a3d;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.tab-playback__scrubber::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #e67a3d;
+  cursor: pointer;
+}
+
+.tab-playback__tick-marks {
+  position: relative;
+  height: 6px;
+  margin-top: 4px;
+}
+
+.tab-playback__tick {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 4px;
+  background: rgba(150, 130, 110, 0.35);
+}
+
+.tab-playback__tick--major {
+  height: 6px;
+  background: rgba(150, 130, 110, 0.55);
+}
+
+.tab-playback__controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tab-playback__btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--tab-border);
+  background: #fff;
+  cursor: pointer;
+  color: #2f2a22;
+  transition: all 160ms ease;
+}
+
+.tab-playback__btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.tab-playback__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tab-playback__btn--primary {
+  background: linear-gradient(135deg, #e67a3d, #d97757);
+  color: #fff;
+  border-color: transparent;
+  width: 44px;
+  height: 44px;
+}
+
+.tab-playback__tempo {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-playback__tempo-label {
+  font-size: 0.78rem;
+  color: var(--tab-text-soft);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tab-playback__tempo-input {
+  width: 70px;
+  padding: 6px 8px;
+  border-radius: var(--tab-radius-sm);
+  border: 1px solid var(--tab-border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  text-align: center;
+  color: #2f2a22;
+  background: #fff;
 }

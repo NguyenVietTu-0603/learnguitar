@@ -94,3 +94,29 @@ export async function getSavedTab(tabId: string) {
     throw new Error(extractApiError(error));
   }
 }
+
+/**
+ * Gọi Flask AI server tổng hợp WAV từ tab data.
+ * Endpoint: POST /api/audio/play với JSON body chứa toàn bộ tab payload.
+ * Trả về Blob audio/wav để caller tự quyết định phát trực tiếp hay tải về.
+ */
+export async function buildAudioFromTab(
+  tabData: TabDetectionResult,
+  options: { noteDuration?: number; silenceBetween?: number } = {},
+): Promise<Blob> {
+  const { noteDuration = 0.5, silenceBetween = 0.05 } = options;
+  try {
+    const response = await tabApi.post(
+      '/api/audio/play',
+      {
+        ...tabData,
+        note_duration: noteDuration,
+        silence_between: silenceBetween,
+      },
+      { responseType: 'blob' },
+    );
+    return response.data as Blob;
+  } catch (error) {
+    throw new Error(extractApiError(error));
+  }
+}
