@@ -19,8 +19,27 @@ from utils import ensure_directory
 
 MODEL_DOWNLOAD_URL = os.getenv(
     "MODEL_DOWNLOAD_URL",
-    "https://huggingface.co/datasets/Pendulumn/GuitarModels/resolve/main/best.pt",
+    "https://github.com/NguyenVietTu-0603/learnguitar/releases/download/v1.0.0/best.pt",
 )
+
+
+def _validate_model_file(path: str) -> None:
+    """Raise if `path` doesn't look like a real PyTorch checkpoint.
+
+    Catches the common case where a download returned an HTML error page
+    (e.g. 401/404) and saved it as `best.pt`. Real .pt files start with the
+    ZIP magic bytes `PK\x03\x04`; HTML responses start with `<`.
+    """
+    with open(path, "rb") as f:
+        head = f.read(4)
+    if head[:2] != b"PK":
+        with open(path, "rb") as f:
+            preview = f.read(200)
+        raise RuntimeError(
+            f"Model file at {path!r} is not a valid PyTorch checkpoint "
+            f"(magic bytes: {head!r}). First bytes: {preview[:120]!r}. "
+            "The download URL likely returned an error page."
+        )
 
 
 def ensure_model_file(model_path: str) -> None:
@@ -34,6 +53,7 @@ def ensure_model_file(model_path: str) -> None:
             return False
 
     if model_path and os.path.exists(model_path) and not _is_lfs_pointer(model_path):
+        _validate_model_file(model_path)
         return
 
     if not MODEL_DOWNLOAD_URL:
@@ -59,22 +79,36 @@ def ensure_model_file(model_path: str) -> None:
         gdown.download(download_url, model_path, quiet=False)
     else:
         import urllib.request
-        req = urllib.request.Request(download_url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=600) as resp, open(model_path, "wb") as out:
-            total = int(resp.headers.get("Content-Length") or 0)
-            read = 0
-            chunk = 1024 * 1024
-            while True:
-                block = resp.read(chunk)
-                if not block:
-                    break
-                out.write(block)
-                read += len(block)
-                if total:
-                    print(f"[startup] {read/1e6:.1f}/{total/1e6:.1f} MB", end="\r", flush=True)
+        req = urllib.request.Request(
+            download_url,
+            headers={
+                "User-Agent": "Mozilla/5.0",
+                "Accept": "application/octet-stream,*/*",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=600) as resp, open(model_path, "wb") as out:
+                total = int(resp.headers.get("Content-Length") or 0)
+                read = 0
+                chunk = 1024 * 1024
+                while True:
+                    block = resp.read(chunk)
+                    if not block:
+                        break
+                    out.write(block)
+                    read += len(block)
+                    if total:
+                        print(f"[startup] {read/1e6:.1f}/{total/1e6:.1f} MB", end="\r", flush=True)
+        except Exception as exc:
+            if os.path.exists(model_path):
+                os.remove(model_path)
+            raise RuntimeError(
+                f"Failed to download model from {download_url}: {exc}"
+            ) from exc
 
     size_mb = os.path.getsize(model_path) / 1e6
     print(f"[startup] Model downloaded: {size_mb:.1f} MB")
+    _validate_model_file(model_path)
 
 
 def create_app() -> Flask:
