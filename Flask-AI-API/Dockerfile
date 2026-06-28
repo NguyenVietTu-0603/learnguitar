@@ -3,7 +3,10 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    YOLO_CONFIG_DIR=/tmp/Ultralytics \
+    HF_HOME=/tmp/huggingface \
+    PORT=7860
 
 WORKDIR /app
 
@@ -24,11 +27,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . ./
 
-RUN mkdir -p uploads outputs
+RUN mkdir -p uploads outputs /tmp/Ultralytics /tmp/huggingface
 
-EXPOSE 5001
+EXPOSE 7860
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5001/health', timeout=5)" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=180s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:7860/health', timeout=5)" || exit 1
 
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5001", "--workers", "2", "--timeout", "180", "--access-logfile", "-", "--error-logfile", "-"]
+# workers=1 keeps RAM under control on free tier; HF Spaces free CPU has 16 GB
+# HF Spaces sets PORT=7860 automatically; gunicorn picks it up via env.
+CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT:-7860} --workers 1 --threads 4 --timeout 180 --graceful-timeout 30 --access-logfile - --error-logfile -"]
