@@ -16,7 +16,7 @@ const menuItems = [
 
 
 export default function TopNavbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -48,6 +48,15 @@ export default function TopNavbar() {
         <div className="top-navbar-actions">
           {isAuthenticated ? (
             <>
+              {isAdmin && (
+                <NavLink
+                  to="/quan-tri"
+                  className={({ isActive }) => `top-menu-link ${isActive ? 'top-menu-link-active' : ''}`.trim()}
+                  style={{ color: '#7c83fd', fontWeight: 600 }}
+                >
+                  Quản trị
+                </NavLink>
+              )}
               <span className="top-navbar-user">Xin chào, {user?.name ?? user?.email}</span>
               <button type="button" className="app-btn app-btn-ghost" onClick={handleLogout}>
                 Đăng xuất

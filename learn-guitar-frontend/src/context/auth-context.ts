@@ -7,6 +7,9 @@ export interface AuthContextValue {
   isCheckingAuth: boolean;
   isSubmitting: boolean;
   errorMessage: string | null;
+  isAdmin: boolean;
+  isTeacher: boolean;
+  isStudent: boolean;
   register: (payload: RegisterPayload) => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => void;

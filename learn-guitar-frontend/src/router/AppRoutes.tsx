@@ -20,6 +20,11 @@ import BlogPage from '../pages/BlogPage';
 import TheoryPage from '../pages/TheoryPage';
 import TheoryDetailPage from '../pages/TheoryDetailPage';
 import AdminStudioPage from '../pages/AdminStudioPage';
+import AdminLayout from '../layouts/AdminLayout';
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import AdminUsersPage from '../pages/admin/AdminUsersPage';
+import AdminCoursesPage from '../pages/admin/AdminCoursesPage';
+import AdminSongsPage from '../pages/admin/AdminSongsPage';
 import QuizStudioPage from '../pages/QuizStudioPage';
 import QuizChord from '../pages/quizchord.page'
 import VideoLessonsPage from '../pages/VideoLessonsPage';
@@ -92,17 +97,28 @@ export default function AppRoutes() {
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/nhan-dien-tab" element={<TabImagePage />} />
 
+      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route element={<AdminLayout />}>
+          <Route path="/quan-tri" element={<AdminDashboardPage />} />
+          <Route path="/quan-tri/nguoi-dung" element={<AdminUsersPage />} />
+          <Route path="/quan-tri/khoa-hoc" element={<AdminCoursesPage />} />
+          <Route path="/quan-tri/bai-hat" element={<AdminSongsPage />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={['admin', 'teacher']} />}>
+        <Route path="/quan-tri/studio" element={<AdminStudioPage />} />
+        <Route path="/quan-tri/quizzes" element={<QuizStudioPage />} />
+        <Route path="/songs/new" element={<SongCreatePage />} />
+        <Route path="/songs/:slug/edit" element={<SongEditorPage />} />
+      </Route>
+
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/khoa-hoc-cua-toi" element={<MyCoursesPage />} />
         <Route path="/quiz-lessons" element={<QuizLessonPracticePage />} />
         <Route path="/thuc-hanh" element={<PracticeRoomPage />} />
-        <Route path="/quan-tri/studio" element={<AdminStudioPage />} />
-        <Route path="/quan-tri/quizzes" element={<QuizStudioPage />} />
-        <Route path="/songs/new" element={<SongCreatePage />} />
-        <Route path="/songs/:slug/edit" element={<SongEditorPage />} />
         <Route path="/quizchord" element={<QuizChord />} />
-        
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

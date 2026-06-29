@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import TopNavbar from '../components/navigation/TopNavbar';
 import MobileBottomNav from '../components/navigation/MobileBottomNav';
 
-const hideNavigationPaths = ['/login', '/register'];
+const hideNavigationPaths = ['/login', '/register', '/quan-tri', '/quan-tri/nguoi-dung', '/quan-tri/khoa-hoc', '/quan-tri/bai-hat', '/quan-tri/quizzes', '/quan-tri/studio'];
 
 export default function MainLayout({ children }: PropsWithChildren) {
   const location = useLocation();

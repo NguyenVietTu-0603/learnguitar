@@ -9,6 +9,7 @@ import './styles/song.css';
 import './styles/chord-detail-page.css';
 import './styles/video-quiz.css';
 import './styles/tab-image.css';
+import './layouts/AdminLayout.css';
 
 
 function App() {

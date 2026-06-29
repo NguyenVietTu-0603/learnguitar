@@ -91,6 +91,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setErrorMessage(null);
   };
 
+  const isAdmin = user?.role === 'admin';
+  const isTeacher = user?.role === 'teacher';
+  const isStudent = user?.role === 'student';
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -98,12 +102,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isCheckingAuth,
       isSubmitting,
       errorMessage,
+      isAdmin,
+      isTeacher,
+      isStudent,
       register,
       login,
       logout,
       clearError,
     }),
-    [user, isCheckingAuth, isSubmitting, errorMessage]
+    [user, isCheckingAuth, isSubmitting, errorMessage, isAdmin, isTeacher, isStudent]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
