@@ -78,11 +78,6 @@ export interface AdminUserListResponse {
   };
 }
 
-const extractError = (error: unknown): string => {
-  if (error instanceof Error) return error.message;
-  return 'Đã xảy ra lỗi. Vui lòng thử lại.';
-};
-
 const adminService = {
   async getStats(): Promise<AdminStats> {
     const res = await api.get<{ success: boolean; data: AdminStats }>('/admin/stats');

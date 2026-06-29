@@ -52,6 +52,7 @@ export interface SongListItem {
   difficulty: SongDifficulty;
   views: number;
   createdAt: string;
+  genre?: string[];
 }
 
 export interface SongDetail {

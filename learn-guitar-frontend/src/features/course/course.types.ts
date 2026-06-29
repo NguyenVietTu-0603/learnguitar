@@ -16,6 +16,7 @@ export interface CourseListItem {
   level: CourseLevel;
   thumbnailUrl?: string | null;
   isPublished?: boolean;
+  createdAt?: string;
 }
 
 export interface CourseEnrollmentResult {

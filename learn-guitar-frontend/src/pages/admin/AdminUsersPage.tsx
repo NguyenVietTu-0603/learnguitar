@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import adminService from '../../features/admin/admin.service';
-import type { AdminUser, AdminUserListResponse } from '../../features/admin/admin.service';
+import type { AdminUser } from '../../features/admin/admin.service';
 
 const roleLabel: Record<string, string> = {
   admin: 'Admin',

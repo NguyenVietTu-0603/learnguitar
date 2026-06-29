@@ -6,22 +6,22 @@ const adminMenu = [
   {
     section: 'Tổng quan',
     items: [
-      { to: '/quan-tri', label: 'Dashboard', icon: '📊', exact: true },
+      { to: '/quan-tri', label: 'Dashboard', icon: '📊', exact: true as const },
     ],
   },
   {
     section: 'Quản lý',
     items: [
-      { to: '/quan-tri/nguoi-dung', label: 'Người dùng', icon: '👥' },
-      { to: '/quan-tri/khoa-hoc', label: 'Khóa học', icon: '📚' },
-      { to: '/quan-tri/bai-hat', label: 'Bài hát', icon: '🎵' },
-      { to: '/quan-tri/quizzes', label: 'Quizzes', icon: '🧩' },
+      { to: '/quan-tri/nguoi-dung', label: 'Người dùng', icon: '👥', exact: false as const },
+      { to: '/quan-tri/khoa-hoc', label: 'Khóa học', icon: '📚', exact: false as const },
+      { to: '/quan-tri/bai-hat', label: 'Bài hát', icon: '🎵', exact: false as const },
+      { to: '/quan-tri/quizzes', label: 'Quizzes', icon: '🧩', exact: false as const },
     ],
   },
   {
     section: 'Nội dung',
     items: [
-      { to: '/quan-tri/studio', label: 'Tạo nội dung', icon: '✏️' },
+      { to: '/quan-tri/studio', label: 'Tạo nội dung', icon: '✏️', exact: false as const },
     ],
   },
 ];
