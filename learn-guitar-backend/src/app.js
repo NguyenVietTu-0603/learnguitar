@@ -21,6 +21,7 @@ import fretboardRoutes from './routes/fretboard.route.js';
 import quizchord from './routes/quizchord.route.js'
 import lessonRoutes from './routes/lesson.route.js';
 import textquizRoutes from './routes/textquiz.route.js';
+import adminRoutes from './routes/admin.route.js';
 
 dotenv.config();
 
@@ -84,6 +85,7 @@ app.use('/api/v1/progress', progressRoutes);
 app.use('/api/v1/quizchord', quizchord);
 app.use('/api/v1/lessons', lessonRoutes);
 app.use('/api/v1/text-quizzes', textquizRoutes);
+app.use('/api/v1/admin', adminRoutes);
 // ====================== GLOBAL ERROR HANDLER =======================
 // Phải đặt sau tất cả routes
 app.use((err, req, res, next) => {
